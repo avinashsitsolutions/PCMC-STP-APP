@@ -1,0 +1,29 @@
+pmc stp app water tanker system
+
+ios build 
+refer = https://www.youtube.com/watch?v=kcnO8K2tWvE
+        https://www.youtube.com/watch?v=0zgDF81ZLrQ
+
+add permissions and api key in info.plist
+
+
+its live on playstore https://play.google.com/store/apps/details?id=com.nyatitechnologies.pcmctanker
+
+login credential 
+admin login : userId = 9999999999
+			  password = 1234577
+
+Admin Login[web] : userId = admin@gmail.com
+				   password = 1234577
+
+Builder Login : userId = 7030531445
+				password = 12345
+
+Project Manager : userId = PCMC/12345/23
+				  password = 12345
+
+Tanker Driver : userId = MH14DW8506
+				password = 12345
+
+Tanker Owner : userId = 9881604554
+			   password = 12345
