@@ -95,7 +95,6 @@ class _LoginState extends State<Login> with AutomaticKeepAliveClientMixin {
           child: Row(
             children: [
               InkWell(
-                // ignore: deprecated_member_use
                 onTap: () => launch('https://pcmcindia.gov.in/index.php'),
                 child: const Padding(
                   padding: EdgeInsets.only(left: 15),
@@ -105,25 +104,28 @@ class _LoginState extends State<Login> with AutomaticKeepAliveClientMixin {
                   ),
                 ),
               ),
-              const SizedBox(
-                width: 8,
-              ),
-              const Column(
-                children: [
-                  Text(
-                    "Pimpri-Chinchwad Municipal Corporation",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 15),
-                  ),
-                  SizedBox(
-                    height: 7,
-                  ),
-                  Text(
-                    "Treated Water Recycle and Reuse System",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 13),
-                  ),
-                ],
+              const SizedBox(width: 8),
+
+              /// 👇 Wrap text part inside Expanded to avoid overflow
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Pimpri-Chinchwad Municipal Corporation",
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      style: TextStyle(fontSize: 15),
+                    ),
+                    SizedBox(height: 7),
+                    Text(
+                      "Treated Water Recycle and Reuse System",
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      style: TextStyle(fontSize: 13),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -1031,9 +1033,9 @@ class _LoginState extends State<Login> with AutomaticKeepAliveClientMixin {
                       width: MediaQuery.of(context).size.width,
                       decoration: const BoxDecoration(
                         borderRadius: BorderRadius.only(
-                          // topLeft: Radius.circular(30),
-                          topRight: Radius.circular(50),
-                        ),
+                            // topLeft: Radius.circular(30),
+                             topRight: Radius.circular(50),
+                            ),
                         color: (Color.fromARGB(255, 186, 226, 171)),
                       ),
                       child: const Center(
