@@ -25,31 +25,28 @@ class _ViewProjectState extends State<ViewProject> {
         if (data1['error'] == true || data1['error'] == false) {
           List<dynamic> data = data1['data'];
 
-          // Update the 'water_type_id' field for all items in bcpList
+          // ✅ parse water_type_id into a safe List<int>
           bcpList = data.map<Map<String, dynamic>>((item) {
-            // Parse the string into a list of integers
-            String waterTypeIdString = item['water_type_id'] as String;
-            waterTypeIdString = waterTypeIdString
-                .replaceAll('[', '')
-                .replaceAll(']', '')
-                .replaceAll('"', '');
-            List<int> waterTypeIdList = waterTypeIdString
-                .split(',')
-                .map<int>((str) => int.tryParse(str.trim()) ?? 0)
-                .toList();
-            // List<int> waterTypeIdList = (item['water_type_id'] as String)
-            //     .replaceAll('[', '')
-            //     .replaceAll(']', '')
-            //     .replaceAll('"', '')
-            //     .split(',')
-            //     .map<int>((str) => int.parse(str.trim()))
-            //     .toList();
+            String? waterTypeIdString = item['water_type_id'] as String?;
+            List<int> waterTypeIdList = [];
+
+            if (waterTypeIdString != null && waterTypeIdString.isNotEmpty) {
+              waterTypeIdString = waterTypeIdString
+                  .replaceAll('[', '')
+                  .replaceAll(']', '')
+                  .replaceAll('"', '');
+              waterTypeIdList = waterTypeIdString
+                  .split(',')
+                  .map<int>((str) => int.tryParse(str.trim()) ?? 0)
+                  .toList();
+            }
 
             return {
               ...item,
               'water_type_id': waterTypeIdList,
             };
           }).toList();
+
           isLoading = false;
         }
       });
@@ -76,9 +73,7 @@ class _ViewProjectState extends State<ViewProject> {
             ),
           ),
           isLoading
-              ? const Center(
-                  child: CircularProgressIndicator(),
-                )
+              ? const Center(child: CircularProgressIndicator())
               : bcpList.isEmpty
                   ? const Text("No Project Name Available")
                   : Expanded(
@@ -88,44 +83,58 @@ class _ViewProjectState extends State<ViewProject> {
                         shrinkWrap: true,
                         itemBuilder: (BuildContext context, int index) {
                           final bcpItem = bcpList[index];
-                          final projectName = bcpItem['ni_project_name'] ?? '';
-                          final bcpNo = bcpItem['ni_bcp_no'] ?? '';
-                          final mobile = bcpItem['ni_site_man_mo_no'] ?? '';
-                          final address = bcpItem['ni_project_address'] ?? '';
-                          final lat = bcpItem['ni_project_lat'] ?? '';
-                          final long = bcpItem['ni_project_long'] ?? '';
-                          final managername = bcpItem['site_manger_name'] ?? '';
-                          final rerano = bcpItem['ni_rera_no'] ?? '';
-                          final projecttype = bcpItem['project_type'] ?? ' ';
+
+                          final projectName =
+                              bcpItem['ni_project_name']?.toString() ?? '';
+                          final bcpNo = bcpItem['ni_bcp_no']?.toString() ?? '';
+                          final mobile =
+                              bcpItem['ni_site_man_mo_no']?.toString() ?? '';
+                          final address =
+                              bcpItem['ni_project_address']?.toString() ?? '';
+                          final lat =
+                              bcpItem['ni_project_lat']?.toString() ?? '';
+                          final long =
+                              bcpItem['ni_project_long']?.toString() ?? '';
+                          final managername =
+                              bcpItem['site_manger_name']?.toString() ?? '';
+                          final rerano =
+                              bcpItem['ni_rera_no']?.toString() ?? '';
+                          final projecttype =
+                              bcpItem['project_type']?.toString() ?? '';
                           final tankertype = (bcpItem['tanker_type'] != null &&
-                                  bcpItem['tanker_type'].isNotEmpty)
-                              ? bcpItem['tanker_type']
+                                  bcpItem['tanker_type'].toString().isNotEmpty)
+                              ? bcpItem['tanker_type'].toString()
                               : 'Select Tanker Type';
-                          final tankerid = (bcpItem['water_type_id']);
+                          final List<int> tankerid =
+                              (bcpItem['water_type_id'] ?? []).cast<int>();
+
                           return Card(
                             child: ListTile(
                               subtitle: Text("Commecement No: $bcpNo"),
                               title: Text("Project Name: $projectName"),
                               trailing: IconButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => UpdateBCP(
-                                                  bcpno: bcpNo.toString(),
-                                                  mobileno: mobile.toString(),
-                                                  id: bcpItem['id'].toString(),
-                                                  projectName: projectName,
-                                                  address: address,
-                                                  lat: lat,
-                                                  long: long,
-                                                  managername: managername,
-                                                  projecttype: projecttype,
-                                                  tankertype: tankertype,
-                                                  selectedBuilders: tankerid,
-                                                )));
-                                  },
-                                  icon: const Icon(Icons.edit)),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => UpdateBCP(
+                                        bcpno: bcpNo,
+                                        mobileno: mobile,
+                                        id: bcpItem['id']?.toString() ?? '',
+                                        projectName: projectName,
+                                        address: address,
+                                        lat: lat,
+                                        long: long,
+                                        managername: managername,
+                                        projecttype: projecttype,
+                                        tankertype: tankertype,
+                                        selectedBuilders: tankerid,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                icon: const Icon(Icons.edit),
+                              ),
                               onTap: () {
                                 // Perform an action when the ListTile is tapped
                               },
@@ -139,11 +148,10 @@ class _ViewProjectState extends State<ViewProject> {
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
-            image: AssetImage(
-                'assets/bottomimage.png'), // Replace with your image path
+            image: AssetImage('assets/bottomimage.png'),
           ),
         ),
-        height: 70, // Adjust the height of the image
+        height: 70,
       ),
     );
   }

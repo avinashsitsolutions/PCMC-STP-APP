@@ -78,7 +78,7 @@ class _ReportGarageState extends State<ReportGarage> {
                   icon: const Icon(
                     Icons.menu,
                     size: 25,
-                    color: Colors.white,
+                    color: Colors.black,
                   ),
                   onPressed: () {
                     Scaffold.of(context).openEndDrawer();
