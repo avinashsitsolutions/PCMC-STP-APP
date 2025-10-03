@@ -152,17 +152,16 @@ class _DashboardState extends State<Dashboard> {
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
+                    const Text(
                       "Pimpri-Chinchwad Municipal Corporation",
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: font12, color: Colors.black),
+                      style: TextStyle(fontSize: 13, color: Colors.black),
                     ),
                     SizedBox(height: height10 / 2),
-                    Text(
+                    const Text(
                       "Treated Water Recycle and Reuse System",
                       textAlign: TextAlign.center,
-                      style:
-                          TextStyle(fontSize: font12 - 2, color: Colors.black),
+                      style: TextStyle(fontSize: 10, color: Colors.black),
                     ),
                   ],
                 ),
