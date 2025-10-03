@@ -1,6 +1,7 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter_android/google_maps_flutter_android.dart';
 import 'package:google_maps_flutter_ios/google_maps_flutter_ios.dart';
@@ -9,6 +10,13 @@ import 'package:tankerpcmc/Auth/splashscreen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Colors.white, // White background for status bar
+    statusBarIconBrightness: Brightness.dark, // Dark icons (Android)
+    statusBarBrightness: Brightness.light, // Dark icons (iOS)
+    systemNavigationBarColor: Colors.white, // White bottom nav bar
+    systemNavigationBarIconBrightness: Brightness.dark,
+  ));
 
   // Ensure platform-specific configurations for Google Maps
   if (defaultTargetPlatform == TargetPlatform.android) {
@@ -36,6 +44,13 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       title: 'PCMC Recycle Water System',
       theme: ThemeData(
+        cardTheme: CardTheme(color: Colors.white),
+        scaffoldBackgroundColor: Colors.white,
+        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+          backgroundColor: Colors.white, // ✅ solid white everywhere
+          elevation: 0,
+        ),
+        appBarTheme: const AppBarTheme(backgroundColor: Colors.white),
         primarySwatch:
             createMaterialColor(const Color.fromARGB(255, 186, 226, 171)),
         textSelectionTheme: const TextSelectionThemeData(

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:tankerpcmc/pmc/adddepartment.dart';
 import 'package:tankerpcmc/pmc/addstp.dart';
 import 'package:tankerpcmc/pmc/dashboard.dart';
@@ -22,79 +23,58 @@ String RegisteredBuilders = '';
 // ignore: non_constant_identifier_names
 String RegisteredSTPs = '';
 
-// getCounts() async {
-//   var response = await http.get(
-//     Uri.parse("https://pcmcstp.stockcare.co.in/public/api/count"),
-//   );
-//   final Map<String, dynamic> data = jsonDecode(response.body);
-//   return data;
-// }
-
-@override
 class _HomePageState extends State<HomePage> {
   int pageIdx = 0;
-  int currentIdx = 0;
 
-  List Pages = [
+  final List Pages = [
     const Dashboard(),
     const AddStp(),
     const ReportPCMC(),
     const OfficerRegistration(),
     const AddDepartment(),
-    // const ProfilePCMC(),
   ];
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return SafeArea(
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        statusBarColor: Colors.white, // ✅ white status bar
+        statusBarIconBrightness: Brightness.dark, // ✅ Android dark icons
+        statusBarBrightness: Brightness.light, // ✅ iOS dark icons
+      ),
       child: Scaffold(
+        backgroundColor: Colors.white, // ✅ fixes iOS black background issue
+        extendBody: true, // ✅ allows body color to flow under status bar
+        body: Pages[pageIdx],
         bottomNavigationBar: BottomNavigationBar(
-          // context,
-
-          backgroundColor: Colors.white,
-          // controller: controler,
+          backgroundColor: Colors.white, // ✅ no black strip on iOS
+          type: BottomNavigationBarType.fixed,
           currentIndex: pageIdx,
+          selectedItemColor: Colors.green,
+          unselectedItemColor: Colors.grey,
+          showSelectedLabels: false,
+          showUnselectedLabels: false,
           items: [
             const BottomNavigationBarItem(
-                icon: Icon(
-                  CupertinoIcons.house_fill,
-                  size: 35,
-                  color: Colors.green,
-                ),
-                label: ''),
+              icon: Icon(CupertinoIcons.house_fill, size: 30),
+              label: '',
+            ),
             const BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.add_home_outlined,
-                  size: 35,
-                  color: Colors.green,
-                ),
-                label: ''),
+              icon: Icon(Icons.add_home_outlined, size: 30),
+              label: '',
+            ),
             BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.summarize_outlined,
-                  size: Dimensions.height35,
-                  color: Colors.green,
-                ),
-                label: ''),
+              icon: Icon(Icons.summarize_outlined, size: Dimensions.height35),
+              label: '',
+            ),
             const BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.app_registration,
-                  size: 35,
-                  color: Colors.green,
-                ),
-                label: ''),
+              icon: Icon(Icons.app_registration, size: 30),
+              label: '',
+            ),
             const BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.add,
-                  size: 35,
-                  color: Colors.green,
-                ),
-                label: ''),
+              icon: Icon(Icons.add, size: 30),
+              label: '',
+            ),
           ],
           onTap: (idx) {
             setState(() {
@@ -102,7 +82,6 @@ class _HomePageState extends State<HomePage> {
             });
           },
         ),
-        body: Pages[pageIdx],
       ),
     );
   }
