@@ -44,6 +44,7 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       title: 'PCMC Recycle Water System',
       theme: ThemeData(
+        cardTheme: CardTheme(color: Colors.white),
         scaffoldBackgroundColor: Colors.white,
         bottomNavigationBarTheme: const BottomNavigationBarThemeData(
           backgroundColor: Colors.white, // ✅ solid white everywhere
