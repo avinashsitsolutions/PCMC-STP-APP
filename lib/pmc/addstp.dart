@@ -795,16 +795,24 @@ class _AddStpState extends State<AddStp> {
                     final LocationController locationController =
                         Get.put(LocationController());
 
-                    List<Placemark> placemarks = await placemarkFromCoordinates(
-                        latLng.latitude, latLng.longitude);
+                    try {
+                      List<Placemark> placemarks =
+                          await placemarkFromCoordinates(
+                              latLng.latitude, latLng.longitude);
 
-                    Placemark place1 = placemarks[0];
-                    Placemark place2 = placemarks[2];
+                      if (placemarks.isNotEmpty) {
+                        Placemark place1 = placemarks[0];
+                        Placemark place2 =
+                            placemarks.length > 1 ? placemarks[1] : place1;
 
-                    locationController.setLocationDetails(
-                        latLng.latitude,
-                        latLng.longitude,
-                        "${place1.name},${place2.name},${place1.subLocality},${place1.locality},${place1.administrativeArea},${place1.postalCode}");
+                        locationController.setLocationDetails(
+                            latLng.latitude,
+                            latLng.longitude,
+                            "${place1.name ?? ""},${place2.name ?? ""},${place1.subLocality ?? ""},${place1.locality ?? ""},${place1.administrativeArea ?? ""},${place1.postalCode ?? ""}");
+                      }
+                    } catch (e) {
+                      debugPrint("Placemark error: $e");
+                    }
 
                     setState(() {});
                     _markers.remove(_marker);
@@ -815,9 +823,6 @@ class _AddStpState extends State<AddStp> {
                         position: latLng,
                         draggable: true,
                         onDragEnd: (LatLng newPosition) async {
-                          // double latitude = newPosition.latitude;
-                          // double longitude = newPosition.longitude;
-
                           setState(() {
                             _marker =
                                 _marker!.copyWith(positionParam: newPosition);

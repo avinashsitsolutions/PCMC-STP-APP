@@ -820,95 +820,76 @@ class _AddBCPState extends State<AddBCP> {
               height: 500,
               width: MediaQuery.of(context).size.width,
               child: GoogleMap(
-                  onMapCreated: _onMapCreated,
-                  myLocationEnabled: true,
-                  mapType: _currentMapType,
-                  initialCameraPosition: const CameraPosition(
-                    target: LatLng(18.628197028586005, 73.80619029626678),
-                    zoom: 14.0,
-                  ),
-                  gestureRecognizers: Set()
-                    ..add(Factory<OneSequenceGestureRecognizer>(
-                        () => EagerGestureRecognizer()))
-                    ..add(Factory<PanGestureRecognizer>(
-                        () => PanGestureRecognizer()))
-                    ..add(Factory<ScaleGestureRecognizer>(
-                        () => ScaleGestureRecognizer()))
-                    ..add(Factory<TapGestureRecognizer>(
-                        () => TapGestureRecognizer()))
-                    ..add(Factory<VerticalDragGestureRecognizer>(
-                        () => VerticalDragGestureRecognizer())),
-                  // double distance = await Geolocator.distanceBetween(
-                  //     18.487500, 73.857023, 18.4864727, 73.79683399999999);
-                  // print('Distance: $distance meters');
-                  markers: Set.of(_marker != null ? [_marker!] : []),
-                  onTap: (LatLng latLng) async {
-                    try {
-                      final LocationController locationController =
-                          Get.put(LocationController());
+                onMapCreated: _onMapCreated,
+                myLocationEnabled: true,
+                mapType: _currentMapType,
+                initialCameraPosition: const CameraPosition(
+                  target: LatLng(18.628197028586005, 73.80619029626678),
+                  zoom: 14.0,
+                ),
+                gestureRecognizers: Set()
+                  ..add(Factory<OneSequenceGestureRecognizer>(
+                      () => EagerGestureRecognizer()))
+                  ..add(Factory<PanGestureRecognizer>(
+                      () => PanGestureRecognizer()))
+                  ..add(Factory<ScaleGestureRecognizer>(
+                      () => ScaleGestureRecognizer()))
+                  ..add(Factory<TapGestureRecognizer>(
+                      () => TapGestureRecognizer()))
+                  ..add(Factory<VerticalDragGestureRecognizer>(
+                      () => VerticalDragGestureRecognizer())),
+                // double distance = await Geolocator.distanceBetween(
+                //     18.487500, 73.857023, 18.4864727, 73.79683399999999);
+                // print('Distance: $distance meters');
+                markers: Set.of(_marker != null ? [_marker!] : []),
+                onTap: (LatLng latLng) async {
+                  try {
+                    final LocationController locationController =
+                        Get.put(LocationController());
 
-                      // Fetch placemarks from the coordinates
-                      List<Placemark> placemarks =
-                          await placemarkFromCoordinates(
-                              latLng.latitude, latLng.longitude);
+                    // Fetch placemarks from the coordinates
+                    List<Placemark> placemarks = await placemarkFromCoordinates(
+                        latLng.latitude, latLng.longitude);
 
-                      // Safely access placemarks with a check
-                      if (placemarks.isNotEmpty) {
-                        Placemark place1 = placemarks[0];
-                        Placemark place2 = placemarks.length > 2
-                            ? placemarks[2]
-                            : Placemark(); // Default empty if not available
+                    if (placemarks.isNotEmpty) {
+                      Placemark place1 = placemarks[0];
+                      // use 2nd if available, else fallback to place1
+                      Placemark place2 =
+                          placemarks.length > 1 ? placemarks[1] : place1;
 
-                        // Set location details
-                        locationController.setLocationDetails(
-                            latLng.latitude,
-                            latLng.longitude,
-                            "${place1.name},${place2.name},${place1.subLocality},${place1.locality},${place1.administrativeArea},${place1.postalCode}");
+                      // ✅ Safe string interpolation with null checks
+                      locationController.setLocationDetails(
+                        latLng.latitude,
+                        latLng.longitude,
+                        "${place1.name ?? ""},${place2.name ?? ""},${place1.subLocality ?? ""},"
+                        "${place1.locality ?? ""},${place1.administrativeArea ?? ""},${place1.postalCode ?? ""}",
+                      );
 
-                        setState(() {});
-                        _markers.remove(_marker);
+                      setState(() {});
+                      _markers.remove(_marker);
 
-                        setState(() {
-                          _marker = Marker(
-                            markerId: const MarkerId('currentMarker'),
-                            position: latLng,
-                            draggable: true,
-                            onDragEnd: (LatLng newPosition) async {
-                              setState(() {
-                                _marker = _marker!
-                                    .copyWith(positionParam: newPosition);
-                              });
-                            },
-                          );
-                          _markers.add(_marker!);
-                        });
-                      } else {
-                        // Handle case when no placemarks are found
-                        print("No placemarks found for this location");
-                        // Optionally, you could show an alert or some fallback behavior
-                      }
-                    } catch (e) {
-                      // Catching any exception that occurs in the try block
-                      print("Error: $e");
-
-                      // Optionally, you can show a user-friendly message (e.g., via a snackbar or dialog)
-                      // For example:
-                      // Get.snackbar("Error", "Failed to fetch location details. Please try again later.");
-
-                      // You could also handle different exceptions separately if needed
-                      if (e is RangeError) {
-                        print("Range error: Invalid placemark index.");
-                        // Handle RangeError specifically, e.g., default to an empty placemark or show a message
-                      } else if (e is SocketException) {
-                        print(
-                            "Network error: Failed to fetch location details.");
-                        // Handle network errors, show a user-friendly message
-                      } else {
-                        // For any other errors
-                        print("Unexpected error: $e");
-                      }
+                      setState(() {
+                        _marker = Marker(
+                          markerId: const MarkerId('currentMarker'),
+                          position: latLng,
+                          draggable: true,
+                          onDragEnd: (LatLng newPosition) {
+                            setState(() {
+                              _marker =
+                                  _marker!.copyWith(positionParam: newPosition);
+                            });
+                          },
+                        );
+                        _markers.add(_marker!);
+                      });
+                    } else {
+                      debugPrint("No placemarks found for this location");
                     }
-                  }),
+                  } catch (e) {
+                    debugPrint("Error while fetching placemarks: $e");
+                  }
+                },
+              ),
             ),
           ],
         ),

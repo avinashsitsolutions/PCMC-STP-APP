@@ -24,18 +24,24 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+
+	<!-- ✅ Correct API Key (no quotes inside string) -->
 	<key>GMSServicesAPIKey</key>
-	<string>"AIzaSyD9XZBYlnwfrKQ1ZK-EUxJtFePKXW_1sfE"</string>
+	<string>AIzaSyD9XZBYlnwfrKQ1ZK-EUxJtFePKXW_1sfE</string>
+
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+
+	<!-- ✅ Camera & Location Permissions -->
 	<key>NSCameraUsageDescription</key>
 	<string>We need your camera to scan.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>We need your location to display the map.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>We need your location to display the map.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>We need your location to display the map.</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>We need your location to display the map.</string>
+
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
