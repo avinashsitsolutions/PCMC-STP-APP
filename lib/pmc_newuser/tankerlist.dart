@@ -1,3 +1,4 @@
+import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:tankerpcmc/builder/builderservices.dart';
@@ -5,7 +6,6 @@ import 'package:tankerpcmc/pmc_newuser/receiptpmcproject.dart';
 import 'package:tankerpcmc/widgets/appbar.dart';
 import 'package:tankerpcmc/widgets/drawerwidget.dart';
 import 'package:http/http.dart' as http;
-// ignore: unused_import
 import 'package:url_launcher/url_launcher.dart';
 
 class TankerListPCMC extends StatefulWidget {
@@ -45,9 +45,7 @@ class _TankerListPCMCState extends State<TankerListPCMC> {
   }
 
   Future<void> bookTanker(int index) async {
-    if (_isBookingInProgress) {
-      return; // Booking already in progress, do nothing
-    }
+    if (_isBookingInProgress) return;
 
     setState(() {
       _isBookingInProgress = true;
@@ -80,15 +78,16 @@ class _TankerListPCMCState extends State<TankerListPCMC> {
           duration: Duration(seconds: 2),
         ),
       );
+
       // ignore: use_build_context_synchronously
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const ReceiptPCMCProject()),
       );
-      final response = await http.get(Uri.parse(url));
-      final response1 = await http.get(Uri.parse(url2));
+
+      await http.get(Uri.parse(url));
+      await http.get(Uri.parse(url2));
     } else {
-      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           backgroundColor: Colors.red,
@@ -102,6 +101,25 @@ class _TankerListPCMCState extends State<TankerListPCMC> {
     setState(() {
       _isBookingInProgress = false;
     });
+  }
+
+  /// ✅ Call method for Android & iOS
+  Future<void> _makePhoneCall(String mob) async {
+    if (Platform.isIOS) {
+      // iOS → open Phone app
+      final Uri url = Uri.parse("tel:$mob");
+      if (await canLaunchUrl(url)) {
+        await launchUrl(
+          url,
+          mode: LaunchMode.externalApplication,
+        );
+      } else {
+        print("❌ Could not launch dialer on iOS");
+      }
+    } else {
+      // Android → direct call
+      await FlutterPhoneDirectCaller.callNumber(mob);
+    }
   }
 
   @override
@@ -123,9 +141,7 @@ class _TankerListPCMCState extends State<TankerListPCMC> {
           width: MediaQuery.of(context).size.width,
           child: Column(
             children: [
-              const SizedBox(
-                height: 20,
-              ),
+              const SizedBox(height: 20),
               const Padding(
                 padding: EdgeInsets.all(8.0),
                 child: Text(
@@ -136,9 +152,7 @@ class _TankerListPCMCState extends State<TankerListPCMC> {
               _isLoading
                   ? const Column(
                       children: [
-                        SizedBox(
-                          height: 50,
-                        ),
+                        SizedBox(height: 50),
                         Center(
                           child: Text(
                             "No Tanker Available...",
@@ -175,7 +189,7 @@ class _TankerListPCMCState extends State<TankerListPCMC> {
                                     Padding(
                                       padding: const EdgeInsets.all(4.0),
                                       child: Text(
-                                        "Tanker Owner Name: ${data['ni_owner_ful_name'].toString()}",
+                                        "Tanker Owner Name: ${data['ni_owner_ful_name']}",
                                         textAlign: TextAlign.center,
                                         style: const TextStyle(fontSize: 17),
                                       ),
@@ -183,7 +197,7 @@ class _TankerListPCMCState extends State<TankerListPCMC> {
                                     Padding(
                                       padding: const EdgeInsets.all(4.0),
                                       child: Text(
-                                        "Tanker Number: ${data['ni_tanker_no'].toString()}",
+                                        "Tanker Number: ${data['ni_tanker_no']}",
                                         textAlign: TextAlign.center,
                                         style: const TextStyle(fontSize: 17),
                                       ),
@@ -191,7 +205,7 @@ class _TankerListPCMCState extends State<TankerListPCMC> {
                                     Padding(
                                       padding: const EdgeInsets.all(4.0),
                                       child: Text(
-                                        "Tanker Capacity: ${data['ni_tanker_capacity'].toString()} Liters",
+                                        "Tanker Capacity: ${data['ni_tanker_capacity']} Liters",
                                         textAlign: TextAlign.center,
                                         style: const TextStyle(fontSize: 17),
                                       ),
@@ -199,37 +213,31 @@ class _TankerListPCMCState extends State<TankerListPCMC> {
                                     Padding(
                                       padding: const EdgeInsets.all(4.0),
                                       child: Text(
-                                        "Mobile No: ${data['ni_tanker_mo_no'].toString()}",
+                                        "Mobile No: ${data['ni_tanker_mo_no']}",
                                         textAlign: TextAlign.center,
                                         style: const TextStyle(fontSize: 17),
                                       ),
                                     ),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
+                                    const SizedBox(height: 10),
                                     Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
                                         ElevatedButton(
                                           onPressed: () {
-                                            var mob = data['ni_tanker_mo_no'];
-                                            FlutterPhoneDirectCaller.callNumber(
-                                                "tel:$mob");
+                                            var mob = data['ni_tanker_mo_no']
+                                                .toString();
+                                            _makePhoneCall(mob);
                                           },
                                           child: const Row(
                                             children: [
                                               Icon(Icons.call),
-                                              SizedBox(
-                                                width: 5,
-                                              ),
-                                              Text("Call "),
+                                              SizedBox(width: 5),
+                                              Text("Call"),
                                             ],
                                           ),
                                         ),
-                                        const SizedBox(
-                                          width: 20,
-                                        ),
+                                        const SizedBox(width: 20),
                                         ElevatedButton(
                                           onPressed: () async {
                                             await bookTanker(index);

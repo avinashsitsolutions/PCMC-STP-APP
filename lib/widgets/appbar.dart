@@ -15,6 +15,7 @@ class _AppbarwidState extends State<Appbarwid> {
       titleSpacing: 0, // Ensures title starts from the left edge
       toolbarHeight: 150,
       centerTitle: false, // Aligns title to the left
+      surfaceTintColor: Colors.transparent,
       title: Row(
         crossAxisAlignment:
             CrossAxisAlignment.center, // Align logo and text vertically

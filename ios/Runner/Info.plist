@@ -24,15 +24,10 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
-
-	<!-- ✅ Correct API Key (no quotes inside string) -->
-	<key>GMSServicesAPIKey</key>
-	<string>AIzaSyD9XZBYlnwfrKQ1ZK-EUxJtFePKXW_1sfE</string>
-
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 
-	<!-- ✅ Camera & Location Permissions -->
+	<!-- ✅ Permissions -->
 	<key>NSCameraUsageDescription</key>
 	<string>We need your camera to scan.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
@@ -63,5 +58,11 @@
 	<false/>
 	<key>io.flutter.embedded_views_preview</key>
 	<true/>
+
+	<!-- ✅ Call support -->
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>tel</string>
+	</array>
 </dict>
 </plist>
