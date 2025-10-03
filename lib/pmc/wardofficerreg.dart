@@ -118,8 +118,9 @@ class _OfficerRegistrationState extends State<OfficerRegistration> {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
-        resizeToAvoidBottomInset: false,
+        // resizeToAvoidBottomInset: false,
         appBar: AppBar(
+          surfaceTintColor: Colors.white,
           titleSpacing: 0,
           centerTitle: true,
           title: Row(
@@ -173,7 +174,8 @@ class _OfficerRegistrationState extends State<OfficerRegistration> {
         ),
         endDrawer: const DrawerWid(),
         body: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
+          //physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.only(bottom: 50),
           child: Column(
             children: [
               const SizedBox(

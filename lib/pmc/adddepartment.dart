@@ -29,8 +29,9 @@ class _AddDepartmentState extends State<AddDepartment> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      // resizeToAvoidBottomInset: false,
       appBar: AppBar(
+        surfaceTintColor: Colors.transparent,
         titleSpacing: 0,
         centerTitle: true,
         title: Row(
@@ -84,7 +85,8 @@ class _AddDepartmentState extends State<AddDepartment> {
       ),
       endDrawer: const DrawerWid(),
       body: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
+        // physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.only(bottom: 50),
         child: Column(
           children: [
             const SizedBox(
