@@ -96,7 +96,7 @@ class _DashboardSocietyState extends State<DashboardSociety> {
                   icon: const Icon(
                     Icons.menu,
                     size: 25,
-                    color: Colors.white,
+                    color: Colors.black,
                   ),
                   onPressed: () {
                     Scaffold.of(context).openEndDrawer();

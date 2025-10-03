@@ -3,9 +3,10 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:multiselect/multiselect.dart';
+//import 'package:multiselect/multiselect.dart';
 import 'package:tankerpcmc/pmc/pmcservices.dart';
 import 'package:tankerpcmc/widgets/drawerWidget.dart';
+import 'package:tankerpcmc/widgets/dropdown_multiselect.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class OfficerRegistration extends StatefulWidget {
@@ -160,7 +161,7 @@ class _OfficerRegistrationState extends State<OfficerRegistration> {
                   icon: const Icon(
                     Icons.menu,
                     size: 25,
-                    color: Colors.white,
+                    color: Colors.black,
                   ),
                   onPressed: () {
                     Scaffold.of(context).openEndDrawer();

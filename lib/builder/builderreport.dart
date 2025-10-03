@@ -3,7 +3,6 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:intl/intl.dart';
 import 'package:tankerpcmc/builder/builderservices.dart';
 import 'package:tankerpcmc/widgets/appbar.dart';
-
 import 'package:tankerpcmc/widgets/drawerWidget.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
 
@@ -15,32 +14,24 @@ class ReportBuilder extends StatefulWidget {
 }
 
 class _ReportBuilderState extends State<ReportBuilder> {
-  // ignore: prefer_typing_uninitialized_variables
   var dropdownValue;
   List<dynamic> _dataList = [];
   bool isLoading = false;
   int _selectedOptionId = 0;
-  bool onchange = false;
-  List<dynamic> options = [];
-  String check = "True";
-  List<Map<String, dynamic>> bcpList = []; // List to store the API response
+  List<Map<String, dynamic>> bcpList = [];
   final TextEditingController _typeAheadController = TextEditingController();
   String _selectedOption = '';
 
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _dateController2 = TextEditingController();
   final TextEditingController _dateController1 = TextEditingController();
+  final TextEditingController _dateController2 = TextEditingController();
+
   void fetchBCPList() {
     Builderservices.bcplist().then((data1) {
       setState(() {
         isLoading = true;
-        if (data1['error'] == true) {
-          List<dynamic> data = data1['data'];
-          bcpList = data.map((item) => item as Map<String, dynamic>).toList();
-        } else if (data1['error'] == false) {
-          List<dynamic> data = data1['data'];
-          bcpList = data.map((item) => item as Map<String, dynamic>).toList();
-        }
+        List<dynamic> data = data1['data'];
+        bcpList = data.map((item) => item as Map<String, dynamic>).toList();
         isLoading = false;
       });
     });
@@ -48,16 +39,44 @@ class _ReportBuilderState extends State<ReportBuilder> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     fetchBCPList();
+
+    // Default To Date = today
+    DateTime now = DateTime.now();
+    String formattedDate = "${now.day}-${now.month}-${now.year}";
+    _dateController2.text = formattedDate;
+  }
+
+  void _onSubmitPressed() {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        isLoading = true;
+      });
+      if (_selectedOption.isNotEmpty) {
+        Builderservices.builderrrport(_selectedOptionId.toString(),
+                _dateController1.text, _dateController2.text)
+            .then((data) {
+          setState(() {
+            _dataList = data['data'];
+            isLoading = false;
+          });
+        });
+      } else {
+        Builderservices.builderrrportall(
+                _dateController1.text, _dateController2.text)
+            .then((data) {
+          setState(() {
+            _dataList = data['data'];
+            isLoading = false;
+          });
+        });
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    DateTime now = DateTime.now();
-    String formattedDate = "${now.day}-${now.month}-${now.year}";
-    _dateController2.text = formattedDate;
     return Scaffold(
       appBar: const PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
@@ -65,53 +84,43 @@ class _ReportBuilderState extends State<ReportBuilder> {
       ),
       endDrawer: const DrawerWid(),
       body: Padding(
-          padding:
-              const EdgeInsets.only(top: 20, left: 10, right: 10, bottom: 10),
-          child: Container(
-            height: MediaQuery.of(context).size.height,
-            decoration: BoxDecoration(
-              color: Colors.green[50],
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: Column(children: [
-              const SizedBox(
-                height: 20,
+        padding: const EdgeInsets.all(10),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.green[50],
+            borderRadius: BorderRadius.circular(15),
+          ),
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
+              const Text(
+                "Reports",
+                style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
               ),
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text(
-                  "Reports",
-                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-                ),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              const SizedBox(
-                width: 320,
-                child: Row(
-                  children: [
-                    Expanded(
-                        child: Text(
+              const SizedBox(height: 20),
+
+              // Date Labels Row
+              Row(
+                children: const [
+                  Expanded(
+                    child: Text(
                       "From Date:",
                       style:
                           TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    )),
-                    SizedBox(
-                      width: 20,
                     ),
-                    Expanded(
-                        child: Text(
+                  ),
+                  Expanded(
+                    child: Text(
                       "To Date:",
                       style:
                           TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    )),
-                  ],
-                ),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(
-                height: 10,
-              ),
+              const SizedBox(height: 10),
+
+              // Date Pickers
               Form(
                 key: _formKey,
                 child: Column(
@@ -128,12 +137,8 @@ class _ReportBuilderState extends State<ReportBuilder> {
                               labelText: 'Date',
                               suffixIcon: Icon(Icons.calendar_today),
                             ),
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return 'Please enter date';
-                              }
-                              return null;
-                            },
+                            validator: (value) =>
+                                value!.isEmpty ? 'Please enter date' : null,
                             onTap: () {
                               DatePicker.showDatePicker(
                                 context,
@@ -150,9 +155,7 @@ class _ReportBuilderState extends State<ReportBuilder> {
                             },
                           ),
                         ),
-                        const SizedBox(
-                          width: 30,
-                        ),
+                        const SizedBox(width: 20),
                         Expanded(
                           child: TextFormField(
                             readOnly: true,
@@ -163,12 +166,8 @@ class _ReportBuilderState extends State<ReportBuilder> {
                               labelText: 'Date',
                               suffixIcon: Icon(Icons.calendar_today),
                             ),
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return 'Please enter date';
-                              }
-                              return null;
-                            },
+                            validator: (value) =>
+                                value!.isEmpty ? 'Please enter date' : null,
                             onTap: () {
                               DatePicker.showDatePicker(
                                 context,
@@ -187,18 +186,16 @@ class _ReportBuilderState extends State<ReportBuilder> {
                         ),
                       ],
                     ),
-                    const SizedBox(
-                      height: 30,
-                    ),
+                    const SizedBox(height: 20),
+
+                    // TypeAhead Field
                     TypeAheadField(
                       textFieldConfiguration: TextFieldConfiguration(
                         decoration: const InputDecoration(
                           hintText: "Select Commecement No First",
                           prefixIcon: Icon(Icons.search,
                               color: Color.fromRGBO(0, 0, 0, 1)),
-                          hintStyle: TextStyle(
-                            color: Colors.black,
-                          ),
+                          hintStyle: TextStyle(color: Colors.black),
                         ),
                         controller: _typeAheadController,
                         style: const TextStyle(
@@ -218,193 +215,130 @@ class _ReportBuilderState extends State<ReportBuilder> {
                             .toList();
                       },
                       itemBuilder: (context, suggestion) {
-                        return ListTile(
-                          title: Text(suggestion),
-                        );
+                        return ListTile(title: Text(suggestion));
                       },
                       onSuggestionSelected: (suggestion) {
                         setState(() {
                           _selectedOption = suggestion;
                           _typeAheadController.text = suggestion;
                           _selectedOptionId = bcpList.firstWhere((item) =>
-                              item['ni_bcp_no'].toString() == suggestion)['id'];
+                              item['ni_bcp_no'].toString() ==
+                              suggestion)['id'] as int;
                         });
                       },
                       noItemsFoundBuilder: (context) {
-                        return const ListTile(
-                          title: Text('No item found'),
-                        );
+                        return const ListTile(title: Text('No item found'));
                       },
                     ),
-                    const SizedBox(
-                      height: 70,
-                    ),
+                    const SizedBox(height: 30),
+
                     ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          if (_selectedOption.isNotEmpty) {
-                            Builderservices.builderrrport(
-                                    _selectedOptionId.toString(),
-                                    _dateController1.text,
-                                    _dateController2.text)
-                                .then((data) {
-                              if (data['error'] == true) {
-                                setState(() {
-                                  _dataList = data['data'];
-                                });
-                                isLoading = false;
-                              } else if (data['error'] == false) {
-                                setState(() {
-                                  _dataList = data['data'];
-                                });
-                                isLoading = false;
-                              }
-                            });
-                          } else {
-                            Builderservices.builderrrportall(
-                                    _dateController1.text,
-                                    _dateController2.text)
-                                .then((data) {
-                              if (data['error'] == true) {
-                                setState(() {
-                                  _dataList = data['data'];
-                                });
-                                isLoading = false;
-                              } else if (data['error'] == false) {
-                                setState(() {
-                                  _dataList = data['data'];
-                                });
-                                isLoading = false;
-                              }
-                            });
-                          }
-                        }
-                      },
+                      onPressed: _onSubmitPressed,
                       child: const Text('Submit'),
                     ),
                   ],
                 ),
               ),
-              isLoading == true
-                  ? const Center(
-                      child: CircularProgressIndicator(),
-                    )
-                  : _dataList.isEmpty
-                      // check == "false"
-                      ? const Center(
-                          child: Column(
-                            children: [
-                              SizedBox(
-                                height: 30,
-                              ),
-                              Text(
-                                "No Reports Available ",
-                                style: TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(
-                                height: 30,
-                              ),
-                            ],
+
+              const SizedBox(height: 20),
+
+              // Results
+              Expanded(
+                child: isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : _dataList.isEmpty
+                        ? const Center(
+                            child: Text(
+                              "No Reports Available",
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                          )
+                        : ListView.builder(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            itemCount: _dataList.length,
+                            itemBuilder: (context, index) {
+                              final data = _dataList[index];
+                              String dateString = data['updated_at'];
+                              final status = data['status'];
+                              DateTime date = DateTime.parse(dateString);
+                              String formattedDate =
+                                  DateFormat('dd-MM-yyyy').format(date);
+
+                              return Column(
+                                children: [
+                                  const SizedBox(height: 20),
+                                  buildDataRow("Serial No:", "${index + 1}"),
+                                  buildDataRow(
+                                      "Project Name:", data['ni_project_name']),
+                                  buildDataRow(
+                                      "Order Completed On:", formattedDate),
+                                  buildDataRow("Water Quantity:",
+                                      "${data['ni_water_capacity']} Liter"),
+                                  buildDataRow("Tanker No:",
+                                      data['ni_tanker_no'].toString()),
+                                  buildDataRow("Site Address:",
+                                      data['address'].toString()),
+                                  buildDataRow("STP Name:",
+                                      data['ni_nearest_stp'].toString()),
+                                  buildDataRow(
+                                      "Distance:", "${data['ni_distance']} Km"),
+                                  buildDataRow("Amount:",
+                                      "₹ ${data['ni_estimated_amount']}"),
+                                  if (status.toString() == "false")
+                                    buildDataRow("Status:", "Pending"),
+                                  if (status.toString() == "null")
+                                    buildDataRow("Status:", "Cancelled"),
+                                  if (status.toString() == "true")
+                                    buildDataRow("Status:", "Complete"),
+                                  const Divider(
+                                      thickness: 1, color: Colors.grey),
+                                ],
+                              );
+                            },
                           ),
-                        )
-                      : Expanded(
-                          child: ListView.builder(
-                              shrinkWrap: true,
-                              physics: const AlwaysScrollableScrollPhysics(),
-                              itemCount: _dataList.length,
-                              itemBuilder: (context, index) {
-                                final data = _dataList[index];
-                                String dateString = data['updated_at'];
-                                final status = data['status'];
-                                DateTime date = DateTime.parse(dateString);
-                                String formattedDate =
-                                    DateFormat('dd-MM-yyyy').format(date);
-                                return Column(
-                                  children: [
-                                    const SizedBox(
-                                      height: 20,
-                                    ),
-                                    buildDataRow(
-                                        "Serial No:", (index + 1).toString()),
-                                    buildDataRow("Project Name:",
-                                        data['ni_project_name']),
-                                    buildDataRow(
-                                        "Order Completed On:", formattedDate),
-                                    buildDataRow("Water Quantity:",
-                                        "${data['ni_water_capacity'].toString()} Liter"),
-                                    buildDataRow("Tankor No:",
-                                        data['ni_tanker_no'].toString()),
-                                    buildDataRow("Site Address:",
-                                        data['address'].toString()),
-                                    buildDataRow("STP Name:",
-                                        data['ni_nearest_stp'].toString()),
-                                    buildDataRow("Distance:",
-                                        "${data['ni_distance'].toString()} Km"),
-                                    buildDataRow("Amount:",
-                                        "₹ ${data['ni_estimated_amount'].toString()}"),
-                                    if (status.toString() == "false")
-                                      buildDataRow("Status:", "Pending"),
-                                    if (status.toString() == "null")
-                                      buildDataRow("Status:", "Cancelled"),
-                                    if (status.toString() == "true")
-                                      buildDataRow("Status:", "Complete"),
-                                    const Divider(
-                                      thickness: 1,
-                                      color: Colors.grey,
-                                    ),
-                                  ],
-                                );
-                              }),
-                        )
-            ]),
-          )),
+              ),
+            ],
+          ),
+        ),
+      ),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
-            image: AssetImage(
-                'assets/bottomimage.png'), // Replace with your image path
+            image: AssetImage('assets/bottomimage.png'),
           ),
         ),
-        height: 70, // Adjust the height of the image
+        height: 70,
       ),
     );
   }
 }
 
+// ✅ Responsive Data Row
 Widget buildDataRow(String label, String? value) {
   return Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      SizedBox(
-        width: 210,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(
-                  left: 30, top: 10, bottom: 10, right: 10),
-              child: Text(
-                label.toString(),
-                style:
-                    const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ],
+      Expanded(
+        flex: 2,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          child: Text(
+            label,
+            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+          ),
         ),
       ),
       Expanded(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              value.toString(),
-              style: const TextStyle(fontSize: 17),
-            ),
-          ],
+        flex: 3,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+          child: Text(
+            value ?? '',
+            style: const TextStyle(fontSize: 17),
+          ),
         ),
-      )
+      ),
     ],
   );
 }

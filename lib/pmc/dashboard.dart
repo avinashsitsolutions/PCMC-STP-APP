@@ -1,38 +1,30 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:tankerpcmc/pmc/builderlist.dart';
-import 'package:tankerpcmc/pmc/dailysupply.dart';
-import 'package:tankerpcmc/pmc/orderlist.dart';
-
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-import 'package:tankerpcmc/pmc/stplist.dart';
-import 'package:tankerpcmc/pmc/tankerlist.dart';
-import 'package:tankerpcmc/pmc/todayreceipt.dart';
-import 'package:tankerpcmc/widgets/dimensions.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+// Your other screens
+import 'builderlist.dart';
+import 'dailysupply.dart';
+import 'orderlist.dart';
+import 'stplist.dart';
+import 'tankerlist.dart';
+import 'todayreceipt.dart';
 import '../widgets/drawerWidget.dart';
 
-// import 'dart:convert';
-// import 'package:http/http.dart' as http;
-
+// ✅ Dashboard Screen
 class Dashboard extends StatefulWidget {
-  const Dashboard({
-    super.key,
-    // required this.myList
-  });
-  // final List<dynamic> myList;
+  const Dashboard({super.key});
+
   @override
   State<Dashboard> createState() => _DashboardState();
 }
 
 class _DashboardState extends State<Dashboard> {
-  bool get wantKeepAlive => true;
   List<dynamic> count = [];
 
-  bool loading = true;
   List<String> imagePaths = [
     'assets/buildings.png',
     'assets/truckfast.png',
@@ -41,6 +33,7 @@ class _DashboardState extends State<Dashboard> {
     'assets/Receipt long.png',
     'assets/Opacity.png',
   ];
+
   List<String> text = [
     'Total No.of Registered Builders',
     'Total No.of Registered Tankers',
@@ -49,12 +42,7 @@ class _DashboardState extends State<Dashboard> {
     'Today Orders',
     'Today\'s Supply(in liters)',
   ];
-//  'Total No.of Registered Tankers',
-//     'Total Orders',
-//     'Daily Supply(in liters)',
-//     'Today Orders',
-//     'Total No.of Registered STP',
-//     'Total No.of Registered Builders',
+
   @override
   void initState() {
     finalList();
@@ -72,7 +60,6 @@ class _DashboardState extends State<Dashboard> {
   finalList() {
     getCounts().then((data) {
       final List<String> dataList = [];
-
       data.forEach((key, value) {
         dataList.add(value.toString());
       });
@@ -111,7 +98,32 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
-    // super.build(context);
+    // ✅ Responsive values using GetX
+    double screenHeight = Get.height;
+    double screenWidth = Get.width;
+
+    double height10 = screenHeight / 84.4;
+    double height20 = screenHeight / 42.2;
+    double height30 = screenHeight / 28.1;
+
+    double width10 = screenWidth / 84.4;
+    double width20 = screenWidth / 42.2;
+
+    double font12 = screenHeight / 70.3;
+    double font16 = screenHeight / 52.7;
+    double font20 = screenHeight / 42.2;
+    double font25 = screenHeight / 33.7;
+
+    double icon20 = screenHeight / 42.2;
+    double icon25 = screenHeight / 33.7;
+
+    // ✅ Adjust grid column count based on screen width
+    int crossAxisCount = screenWidth < 600
+        ? 2
+        : screenWidth < 900
+            ? 3
+            : 4;
+
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
@@ -122,29 +134,25 @@ class _DashboardState extends State<Dashboard> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               InkWell(
-                // ignore: deprecated_member_use
-                onTap: () => launch('https://pcmcindia.gov.in/index.php'),
-                child: const Image(
-                  image: AssetImage('assets/pcmc_logo.jpg'),
-                  height: 50,
-                ),
+                onTap: () =>
+                    launchUrl(Uri.parse('https://pcmcindia.gov.in/index.php')),
+                child:
+                    Image.asset('assets/pcmc_logo.jpg', height: height30 * 1.5),
               ),
-              const SizedBox(
-                width: 5,
-              ),
-              const Column(
+              SizedBox(width: width10),
+              Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
                     "Pimpri-Chinchwad Municipal Corporation",
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 13),
+                    style: TextStyle(fontSize: font12),
                   ),
-                  SizedBox(height: 5),
+                  SizedBox(height: height10 / 2),
                   Text(
                     "Treated Water Recycle and Reuse System",
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 10),
+                    style: TextStyle(fontSize: font12 - 2),
                   ),
                 ],
               ),
@@ -154,11 +162,7 @@ class _DashboardState extends State<Dashboard> {
             Builder(
               builder: (BuildContext context) {
                 return IconButton(
-                  icon: const Icon(
-                    Icons.menu,
-                    size: 25,
-                    color: Colors.white,
-                  ),
+                  icon: Icon(Icons.menu, size: icon25, color: Colors.black),
                   onPressed: () {
                     Scaffold.of(context).openEndDrawer();
                   },
@@ -169,124 +173,87 @@ class _DashboardState extends State<Dashboard> {
         ),
         endDrawer: const DrawerWid(),
         body: Padding(
-          padding: const EdgeInsets.only(left: 10, right: 10),
-          child: LayoutBuilder(builder: (context, constraints) {
-            return count.isNotEmpty
-                ? GridView.builder(
-                    itemCount: count.length,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisSpacing: 20,
-                      crossAxisCount: 2,
-                      childAspectRatio:
-                          constraints.maxWidth / (constraints.maxHeight * 0.7),
-                    ),
-                    itemBuilder: (context, index) {
-                      return InkWell(
-                        onTap: () {
-                          switch (index) {
-                            case 0:
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const BuilderList()),
-                              );
-
-                              break;
-                            case 1:
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const TankerList()));
-
-                              break;
-                            case 2:
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const StpList()),
-                              );
-
-                              break;
-                            case 3:
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const OrderList()),
-                              );
-
-                              break;
-                            case 4:
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const TodayReceipt()),
-                              );
-                              break;
-                            case 5:
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const DailySupply()),
-                              );
-                              break;
-                          }
-                        },
-                        child: SizedBox(
-                            child: Padding(
-                          padding: const EdgeInsets.only(top: 30),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.green[50],
-                              borderRadius: BorderRadius.circular(20),
+          padding: EdgeInsets.symmetric(horizontal: width10),
+          child: count.isNotEmpty
+              ? GridView.builder(
+                  itemCount: count.length,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisSpacing: width20,
+                    mainAxisSpacing: height20,
+                    crossAxisCount: crossAxisCount,
+                    childAspectRatio: 1,
+                  ),
+                  itemBuilder: (context, index) {
+                    return InkWell(
+                      onTap: () {
+                        switch (index) {
+                          case 0:
+                            Get.to(() => const BuilderList());
+                            break;
+                          case 1:
+                            Get.to(() => const TankerList());
+                            break;
+                          case 2:
+                            Get.to(() => const StpList());
+                            break;
+                          case 3:
+                            Get.to(() => const OrderList());
+                            break;
+                          case 4:
+                            Get.to(() => const TodayReceipt());
+                            break;
+                          case 5:
+                            Get.to(() => const DailySupply());
+                            break;
+                        }
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(width10),
+                        decoration: BoxDecoration(
+                          color: Colors.green[50],
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircleAvatar(
+                              radius: height20,
+                              child: Image.asset(
+                                imagePaths[index],
+                                fit: BoxFit.cover,
+                              ),
                             ),
-                            child: Column(
-                              children: [
-                                CircleAvatar(
-                                    radius: 20,
-                                    child: Image.asset(
-                                      imagePaths[index],
-                                      fit: BoxFit.cover,
-                                      scale: 1.2,
-                                    )),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                Text(
-                                  count[index],
-                                  style: const TextStyle(
-                                      fontSize: 25,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                Text(
-                                  text[index].toString(),
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ],
+                            SizedBox(height: height10),
+                            Text(
+                              count[index],
+                              style: TextStyle(
+                                fontSize: font20,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                        )),
-                      );
-                    },
-                  )
-                : SizedBox(
-                    height: Dimensions.screenHeight / 2,
-                    child: const Center(
-                        // widthFactor: ,
-                        child: CircularProgressIndicator()),
-                  );
-          }),
+                            SizedBox(height: height10),
+                            Text(
+                              text[index],
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: font16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                )
+              : SizedBox(
+                  height: screenHeight / 2,
+                  child: const Center(child: CircularProgressIndicator()),
+                ),
         ),
       ),
     );
-    // ));
   }
 }
