@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:tankerpcmc/society/receiptsociety.dart';
@@ -102,6 +104,25 @@ class _TankerListSocietyState extends State<TankerListSociety> {
     setState(() {
       _isBookingInProgress = false;
     });
+  }
+
+  /// ✅ Call method for Android & iOS screen not found
+  Future<void> _makePhoneCall(String mob) async {
+    if (Platform.isIOS) {
+      // iOS → open Phone app
+      final Uri url = Uri.parse("tel:$mob");
+      if (await canLaunchUrl(url)) {
+        await launchUrl(
+          url,
+          mode: LaunchMode.externalApplication,
+        );
+      } else {
+        print("❌ Could not launch dialer on iOS");
+      }
+    } else {
+      // Android → direct call
+      await FlutterPhoneDirectCaller.callNumber(mob);
+    }
   }
 
   @override
@@ -213,9 +234,9 @@ class _TankerListSocietyState extends State<TankerListSociety> {
                                       children: [
                                         ElevatedButton(
                                           onPressed: () {
-                                            var mob = data['ni_tanker_mo_no'];
-                                            FlutterPhoneDirectCaller.callNumber(
-                                                "tel:$mob");
+                                            var mob = data['ni_tanker_mo_no']
+                                                .toString();
+                                            _makePhoneCall(mob);
                                           },
                                           child: const Row(
                                             children: [
