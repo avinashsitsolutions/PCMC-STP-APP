@@ -64,5 +64,7 @@
 	<array>
 		<string>tel</string>
 	</array>
+	<key>NSAllowsArbitraryLoads</key>
+	<true/>
 </dict>
 </plist>
